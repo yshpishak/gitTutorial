@@ -1,0 +1,47 @@
+!!! for beginners : free ---   1. https://d3js.org/  - veľká grafická knižnica. Mnoho knižníc je postavených na tomto základe.  - Filip radil
+!!! for beginners : free ---   2. Cooggle Chart: https://developers.google.com/chart  |  Google Developershttps://developers.google.com
+==========================================================================
+
+
+!!! free + commerc - ok - 1. https://canvasjs.com/javascript-candlestick-chart/   - Teraz to používam z Angular 8
++Angular                                                                                     Mal som otázky a korešpondoval som s podpornou skupinou.
+===                                                                                     Všetky problémy boli vyriešen
+
+
+working now:  library ok - !!! free + comerc 1. https://www.fusioncharts.com/
++Angular
+------------
+
+!!! study,  free + commerc - 2. https://www.amcharts.com/demos/#candlestick  - made from charts.js
+
+!!! study -- free + comerc - 3. https://www.arction.com/javascript-chart/?gclid=EAIaIQobChMI38Hv6c-o5wIVSsjeCh1beweoEAAYASAAEgIPi_D_BwE
+===          https://www.arction.com/lightningchart-js-interactive-examples/
+
+!!! study, free  -  4. https://www.chartjs.org/                                        - Filip, Rado  radili
+                       https://www.chartjs.org/chartjs-chart-financial/index.html
+
+
+
+send message for load library.  !!! study,  free + commerc - 1. https://www.chartiq.com/html5-charting-library/
++ Angular
+===
+
+
+
+===================================================================================================
+
+??? free + comerc  1. https://www.highcharts.com/blog/products/highstock/
+
+??? free + comerc 2. https://www.anychart.com/ru/products/anystock/overview/ 10. https://www.anychart.com/features/
+
+??? free + comerc  3. https://www.zingchart.com/gallery
+
+===================================================================================================
+===================================================================================================
+
+/// ??? study, free + comerc  - 1. https://plot.ly/javascript/financial-charts/
+===================================================================================================
+//  http://techanjs.org/  (AKO PRIKLAD)
+===================================================================================================
+// https://www.sitepoint.com/best-javascript-charting-libraries/  - for me
+
