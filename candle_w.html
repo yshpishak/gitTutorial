@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Candlestick</title>
+</head>
+<style>
+    body {
+        font: 10px sans-serif;
+        background: #3c3c3c;
+        color: #fff;
+    }
+
+    .crosshair {
+        cursor: crosshair;
+    }
+
+    line {
+        fill: none;
+        stroke-width: 0.1;
+        stroke: white;
+    }
+
+    .grid .gridVolume line {
+        stroke-opacity: 0.2;
+        shape-rendering: crispEdges;
+    }
+
+</style>
+<script src="http://d3js.org/d3.v5.min.js"> </script>
+<script src="moment.js"> </script>
+<body>
+<script>
+
+    // https://medium.com/@anilnairxyz/candlestick-chart-using-d3-a7f978578cd7
+    // https://bl.ocks.org/anilnairxyz/a51393d7c51342abe8d4e3f4cbab7ae1
+    // https://bl.ocks.org/tompiler/6045b80d2164077faaf96e0304531bba
+    // http://qaru.site/questions/375917/using-d3js-to-make-a-candlestick-or-ohlc-chart
+    // C:\Users\jv\PycharmProjects\techanjs
+
+    var workSpaceX = window.innerWidth*0.98,
+        workSpaceY = window.innerHeight*0.98;
+
+    var margin = {top: 20, right: 40, bottom: 150, left: 30}
+
+    var width = workSpaceX - margin.left - margin.right,
+        height = workSpaceY - margin.top - margin.bottom;
+    heightVolume = workSpaceY - margin.top;
+
+    // work space
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .style("cursor", "crosshair");
+
+    var svgVolume = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom);
+
+    //определим рaбочую область OHLC
+    var chartOHLC =  svg.append("rect")
+        .attr("x",margin.left)
+        .attr("y",margin.top)
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "#3c3c3c")
+        .on("click", clicked);
+
+    var chartVolume =  svg.append("rect")
+        .attr("x",margin.left)
+        .attr("y",(heightVolume-130))
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "#3c3c3c")
+        .on("click", clickedVolume);
+
+    // groupe element (first groupe)
+    svg.append("g")
+        .attr("transform", "translate("+margin.left + "," + margin.top+")")
+
+    /************************* OHLC chart **********************/
+
+    // Create scale X
+    /*
+    var xBottom = d3.scaleLinear()
+            .domain([0, width]) // inputData
+            .range([0, width]); // outputData
+    */
+    var xBottom = d3.scaleTime()
+        .domain([new Date(2018, 0, 1), new Date(2018, 01, 31)])
+        .range([0, width]); // outputData
+
+    var xTop = xBottom;
+
+    // Create scale Y
+    var yRight = d3.scaleLinear()
+        .domain([height, 0]) // inputData
+        .range([0, height]); // outputData
+
+    var yLeft = d3.scaleLinear()
+        .domain([height/3, 0]) // inputData
+        .range([0, height]); // outputData
+
+    /************************* Add scales to axis **********************/
+
+// var tF = d3.timeFormat("%m/%Y");
+// var tF = d3.timeFormat("%b/%Y");
+
+
+    var xAxisBottom = d3.axisBottom()
+        .scale(xBottom)
+        .tickSize(5, 0)
+        .tickFormat(d3.timeFormat("%d/%m/%Y"))
+        .ticks(10);
+
+    /*
+    https://bl.ocks.org/mbostock/1849162
+     .ticks(d3.time.months)
+        .tickSize(16, 0)
+        .tickFormat(d3.time.format("%B"));
+    */
+    //xAxisBottom = tf.parse(xBottom);
+
+
+    var xAxisTop = d3.axisTop()
+        .scale(xTop);
+
+    var yAxisRight = d3.axisRight()
+        .scale(yRight);
+
+    var yAxisLeft = d3.axisLeft()
+        .scale(yLeft)
+        .ticks(5);
+
+    /************************* Volume chart **********************/
+
+    var xVolume = xBottom;
+
+    var xAxisVolume = d3.axisBottom()
+        .scale(xVolume);
+
+    // Create scale Y
+    var yRightVolume = d3.scaleLinear()
+        .domain([50, 0]) // inputData
+        .range([0, margin.bottom-margin.top]); // outputData
+
+    var yLeftVolume = d3.scaleLinear()
+        .domain([20, 0]) // inputData
+        .range([0, margin.bottom-margin.top]); // outputData
+
+    /************************* Add Volume scales to axis **********************/
+
+    var yAxisRightVolume = d3.axisRight()
+        .scale(yRightVolume)
+        .ticks(5);
+
+    var yAxisLeftVolume = d3.axisLeft()
+        .scale(yLeftVolume)
+        .ticks(4);
+
+    /************************* X Axis **********************/
+    svg.append("g")
+        .attr("class", "xAxisBottom")
+        .attr("transform", "translate(" + margin.left + ","+ (margin.top + height)+")");
+    //        .call(xAxisBottom);
+
+    svg.append("g")
+        .attr("class", "xAxisTop")
+        .attr("transform", "translate(" + margin.left + ","+ margin.top +")");
+    //        .call(xAxisTop);
+
+    /************************* Y Axis **********************/
+    svg.append("g")
+        .attr("class", "yAxisRight")
+        .attr("transform", "translate(" + (margin.left + width) + ","+ margin.top+")");
+    //        .call(yAxisRight);
+
+    svg.append("g")
+        .attr("class", "yAxisLeft")
+        .attr("transform", "translate(" + margin.left + ","+ margin.top+")");
+    //        .call(yAxisLeft);
+
+    /************************* Volume **********************/
+    svg.append("g")
+        .attr("class", "xAxisVolume")
+        .attr("transform", "translate(" + margin.left + ","+ heightVolume +")");
+
+    svg.append("g")
+        .attr("class", "yAxisRightVolume")
+        .attr("transform", "translate(" + (margin.left + width+20) + "," + (height + margin.top)+")");
+    //        .call(yAxisRightVolume);
+
+    svg.append("g")
+        .attr("class", "yAxisLeftVolume")
+        .attr("transform", "translate(" + (margin.left-10) + ","+ (height + margin.top)+")");
+    //        .call(yAxisLeftVolume);
+
+    /************************* Grid OHLC **********************/
+    /* https://bl.ocks.org/d3noob/c506ac45617cf9ed39337f99f8511218 */
+
+    // gridlines in x axis function
+    function make_x_gridlines() {
+        return d3.axisBottom(xBottom)
+            .ticks(8)
+    }
+
+    // add the X gridlines - vertical lines
+    svg.append("g")
+        .attr("class", "gridVolume")
+        .attr("transform", "translate(" + margin.left + ","+ heightVolume +")")
+        .call(make_x_gridlines()
+            .tickSize(-height)
+            .tickFormat("")
+        )
+
+    // gridlines in y axis function
+    function make_y_gridlines() {
+        return d3.axisLeft(yRight)
+            .ticks(11)
+    }
+
+    // add the Y gridlines - horizontal lines
+    svg.append("g")
+        .attr("class", "gridVolume")
+        .attr("transform", "translate("+ margin.left + ', ' + margin.top +")")
+        .call(make_y_gridlines().tickSize(-width) .tickFormat(""))
+
+
+    /************************* Grid Volume **********************/
+
+    function make_x_gridlinesVolume() {
+        return d3.axisBottom(xVolume)
+            .ticks(8)
+    }
+
+    // add the X gridlines - vertical lines
+    svg.append("g")
+        .attr("class", "gridVolume")
+        .attr("transform", "translate("+ margin.left+ ', ' + (margin.top+height) + ")")
+        .call(make_x_gridlinesVolume()
+            .tickSize(-height)
+            .tickFormat("")
+        )
+
+    // gridlines in y axis function
+    function make_y_gridlinesVolume() {
+        return d3.axisRight(yRightVolume)
+            .ticks(5)
+    }
+
+    // add the Y gridlines - horizontal lines
+    svg.append("g")
+        .attr("class", "gridVolume")
+        .attr("transform", "translate(" + (margin.left+width) + "," + (height + margin.top)+")")
+        .call(make_y_gridlinesVolume().tickSize(-width) .tickFormat(""))
+
+
+
+    /********************************** Cursor Crosshair http://bl.ocks.org/andredumas/045f550b72ad46301130 **********************************/
+    //    svg.append('g')
+    //        .attr("class", "crosshair")
+    //        .call(crosshair);
+    // crosshair
+    //        .each(function(d) { move(d); }); // Display the current data
+
+
+    /************************** Start work *******************************/
+
+    draw();
+
+    /*********************************************************/
+    function draw() {
+        /************************* OHLC **********************/
+        // axis X
+        svg.selectAll("g.xAxisBottom").call(xAxisBottom);
+        svg.selectAll("g.xAxisTop").call(xAxisTop);
+        // axis Y
+        svg.selectAll("g.yAxisLeft").call(yAxisLeft);
+        svg.selectAll("g.yAxisRight").call(yAxisRight);
+
+        /************************* Volume **********************/
+
+        svg.selectAll("g.xAxisVolume").call(xAxisVolume);
+        svg.selectAll("g.yAxisRightVolume").call(yAxisRightVolume);
+        svg.selectAll("g.yAxisLeftVolume").call(yAxisLeftVolume);
+        //
+        // rectangles
+
+    }
+    /*********************************************************/
+    function clicked()
+    {
+        let mouse = d3.mouse(this);
+        let xPos = Math.round(xBottom.invert(mouse[0] - margin.left));
+        let yPos = Math.round(yRight.invert(mouse[1]-margin.top));
+
+        let date = new  Date(xPos);
+
+
+        let day = (date.getDate() < 10)? '0'+date.getDate() : date.getDate();
+        let month  =  ((date.getMonth()+1) < 10)? '0'+(date.getMonth()+1) : (date.getMonth()+1);
+        let dt = day +'/'+ month + '/'+ date.getFullYear();
+        console.log(dt, yPos);
+    }
+
+    function clickedVolume()
+    {
+        let mouse = d3.mouse(this);
+        let xPos = Math.round(xBottom.invert(mouse[0] - margin.left));
+        let yPos = Math.round(yRight.invert(mouse[1]-margin.top));
+        console.log(xPos, yPos);
+        //alert(x.invert(mouse[0] - margin.left)+", "+ y.invert(mouse[1]+margin.top));
+    }
+
+    /********************************************************/
+</script>
+</body>
+</html>
