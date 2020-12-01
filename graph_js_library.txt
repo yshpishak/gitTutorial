@@ -1,3 +1,7 @@
+hELLO WORLD !!!
+===============
+
+
 !!! for beginners : free ---   1. https://d3js.org/  - veľká grafická knižnica. Mnoho knižníc je postavených na tomto základe.  - Filip radil
 !!! for beginners : free ---   2. Cooggle Chart: https://developers.google.com/chart  |  Google Developershttps://developers.google.com
 ==========================================================================
